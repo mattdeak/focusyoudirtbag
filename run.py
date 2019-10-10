@@ -1,7 +1,10 @@
+#!/usr/bin/python3
+from blocker import run
 import argparse
 import daemon
 import logging
-from blocker import run
+import os
+import sys
 
 def cmdline_args():
     parser = argparse.ArgumentParser(description='Focus you dirtbag. Stop visiting timewaster sites.')
@@ -19,6 +22,8 @@ def logger_config(logfile, loglevel):
         format=format_str,
         handlers=[handler])
 
+    return handler
+
 
 def parse_config():
     with open('websites.config', 'r') as config_file:
@@ -29,15 +34,10 @@ def parse_config():
     return config_args
 
 def has_sufficient_access():
-    try:
-        with open('/etc/hosts','w') as file:
-            return True
-    except PermissionError as e:
-        error_msg = "This program was not run with sufficient priviledge to modify to /etc/hosts"
-        logging.error(error_msg)
-        print(error_msg)
+    return os.access('/etc/hosts', os.W_OK)
 
 if __name__ == '__main__':
+
     args = cmdline_args()
 
     if args.loglevel == 'DEBUG':
@@ -49,12 +49,18 @@ if __name__ == '__main__':
     else:
         loglevel = logging.ERROR
 
-    logger_config(args.logfile, loglevel)
-    config_args = parse_config()
+    handler = logger_config(args.logfile, loglevel)
 
+    if not has_sufficient_access():
+        error_msg = "This program was not run with sufficient priviledge to modify to /etc/hosts"
+        print(error_msg)
+        logging.error(error_msg)
+        sys.exit(1)
+
+    config_args = parse_config()
     if args.fg:
         run(config_args)
     else: # Run in background
-        with daemon.DaemonContext():
+        with daemon.DaemonContext(files_preserve=[handler.stream.fileno()]):
             run(config_args)
 

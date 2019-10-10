@@ -29,7 +29,6 @@ def allow(website):
         lines = hostfile.readlines()
         hostfile.seek(0)
         for line in lines:
-
             if target_string not in line:
                 hostfile.write(line)
         hostfile.truncate()
