@@ -28,6 +28,15 @@ def parse_config():
     config_args = [{'website': l[0], 'day': l[1], 'start': int(l[2]), 'end': int(l[3])} for l in lines]
     return config_args
 
+def has_sufficient_access():
+    try:
+        with open('/etc/hosts','w') as file:
+            return True
+    except PermissionError as e:
+        error_msg = "This program was not run with sufficient priviledge to modify to /etc/hosts"
+        logging.error(error_msg)
+        print(error_msg)
+
 if __name__ == '__main__':
     args = cmdline_args()
 
