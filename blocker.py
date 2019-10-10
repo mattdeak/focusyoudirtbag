@@ -59,7 +59,10 @@ def scheduler(schedule_list):
             s.append((allow_time, schedule['website'], 'ALLOW'))
 
         s = sorted(s)
-        s.append((None, None, "reset")) # This is ugly
+
+        tomorrow = today + datetime.timedelta(days=1)
+        reset_execution_time = datetime.datetime(tomorrow.year, tomorrow.month, tomorrow.day, 0, 0, 0) # Restart at midnight
+        s.append((reset_execution_time, None, "reset"))
 
         logging.debug(f"Today's scheduled events: {s}")
         for item in s:
