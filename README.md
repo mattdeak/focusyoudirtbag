@@ -5,7 +5,7 @@ Just run `python run.py` after filling up the config file. I needed this because
 ### Config file
 Add websites you want to block as follows:
 
-WEBSITE DAY START_HOUR END_HOUR
+WEBSITE WEEKDAY START_HOUR END_HOUR
 
 DAY can be numeric (0 is monday - 7 is sunday) or "weekdays". 
 START_HOUR and END_HOUR are the hour as represented on a 24 hour clock.
