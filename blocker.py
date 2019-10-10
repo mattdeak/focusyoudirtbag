@@ -77,7 +77,11 @@ def run(config_args):
         # Pause until next scheduled item
         logging.info(f"{action},{website} scheduled at {next_execution}")
         logging.debug(f"Sleeping for {sleep_time_s} seconds")
-        time.sleep(sleep_time_s)
+
+        # If two events are scheduled simultaneously, it's possible to sleep time to be slightly
+        # negative due to latency. If that's the case, just don't sleep at all
+        if sleep_time_s > 0:
+            time.sleep(sleep_time_s)
 
         if action == 'ALLOW':
             allow(website)
